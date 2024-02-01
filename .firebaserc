@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "ifnanfaapp101",
+    "fileuploader": "ifnanfaapp101"
+  },
+  "targets": {
+    "ifnanfaapp101": {
+      "hosting": {
+        "myfileupload": [
+          "ifnanfaapp101"
+        ]
+      }
+    }
+  }
+}
