@@ -3085,6 +3085,7 @@ __metadata:
     npm-run-all2: "npm:^6.1.1"
     pinia: "npm:^2.1.7"
     prettier: "npm:^3.0.3"
+    quasar: "npm:^2.14.3"
     typescript: "npm:~5.3.0"
     unplugin-vue-router: "npm:^0.7.0"
     vite: "npm:^5.0.11"
@@ -4458,6 +4459,13 @@ __metadata:
   version: 2.3.1
   resolution: "punycode@npm:2.3.1"
   checksum: 14f76a8206bc3464f794fb2e3d3cc665ae416c01893ad7a02b23766eb07159144ee612ad67af5e84fa4479ccfe67678c4feb126b0485651b302babf66f04f9e9
+  languageName: node
+  linkType: hard
+
+"quasar@npm:^2.14.3":
+  version: 2.14.3
+  resolution: "quasar@npm:2.14.3"
+  checksum: a2d19dc733da98bae2c89facf368a536b9171ee8f4f064200d3cadd379ecf75a45b78a76dd3f778cebe5b34b65ac07969508731cd138be7c3795364e96ea82aa
   languageName: node
   linkType: hard
 
