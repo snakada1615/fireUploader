@@ -1,13 +1,17 @@
 <template>
-  <!-- <select v-model="selectedFile">
-    <option disabled value="">Please select a file</option>
-    <option v-for="file in files" :key="file.name" :value="file">{{ file.name }}</option>
-  </select>
-  <button @click="downloadFile">Download Selected File</button> -->
-  <q-select outlined v-model="selectedFile" label="select file to download" :options="files" :dense=true :options-dense=true style="max-width: 300px"
->
+  <div>Selected File: {{ selectedFile ? selectedFile.fullPath : 'None' }}</div>
+  <q-select
+    outlined
+    v-model="selectedFile"
+    label="select file to download"
+    :options="files"
+    :on-update:model-value="onUpdate"
+    :dense="true"
+    :options-dense="true"
+    style="max-width: 300px"
+  >
     <template v-slot:after>
-      <q-btn round dense flat icon="download"  @click="downloadFile"></q-btn>
+      <q-btn round dense flat icon="download" @click="downloadFile"></q-btn>
     </template>
   </q-select>
 </template>
@@ -15,31 +19,35 @@
 <script setup lang="ts">
 import { type Ref, ref, onMounted } from 'vue'
 import { storage } from '../plugins/fireFunctions'
-import { ref as storageRef, getDownloadURL, listAll, type StorageReference } from 'firebase/storage'
-interface FileWithFullPath {
-  [x: string]: string
+import { ref as storageRef, getDownloadURL, listAll } from 'firebase/storage'
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
+
+// Representing files with simple objects containing only serializable properties
+interface FileItem {
+  label: string
   fullPath: string
-  // ... any other properties that might be needed ...
 }
 
-const selectedFile: Ref<FileWithFullPath | null> = ref(null) // Define the property as a ref with an initial value.
-  type fileItem = {label: string, value:StorageReference }
-const files = ref<fileItem[]>([]) // Specify the type of the elements in the array.const selectedFile = ref(null);
+const selectedFile: Ref<FileItem | null> = ref(null)
+const files = ref<FileItem[]>([])
 
 onMounted(async () => {
   try {
     const listRef = storageRef(storage, 'files/')
     const res = await listAll(listRef)
-    files.value = res.items.map((val)=>{
-      return {
-        label: val.name,
-        value: val
-      }
-    }) 
+    files.value = res.items.map((item) => ({
+      label: item.name,
+      fullPath: item.fullPath // Assume fullPath here is a string representing the file path within Firebase storage
+    }))
   } catch (error) {
     console.error('Failed to load files', error)
   }
 })
+
+function onUpdate(fileItem: FileItem) {
+  selectedFile.value = fileItem
+}
 
 const downloadFile = async () => {
   if (!selectedFile.value) return
@@ -52,14 +60,14 @@ const downloadFile = async () => {
     let tempLink = document.createElement('a')
     tempLink.style.display = 'none'
     tempLink.href = url
-    tempLink.setAttribute('download', selectedFile.value.name)
+    tempLink.setAttribute('download', selectedFile.value.label)
     document.body.appendChild(tempLink)
     tempLink.click()
     document.body.removeChild(tempLink)
-    alert('download complete!')
+    $q.notify('Download complete!')
   } catch (error) {
     console.error('Download failed', error)
-    alert('download failed!')
+    $q.notify('Download failed!')
   }
 }
 </script>
