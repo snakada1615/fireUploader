@@ -1,23 +1,49 @@
 <template>
-  <input type="file" @change="onFileChange" />
+  <div class="q-pa-md">
+    <div class="q-gutter-md row items-start">
+      <q-file
+        v-model="files"
+        label="Pick files to upload"
+        @update:model-value="onFileChange"
+        filled
+        counter
+        dense
+        style="max-width: 300px"
+      >
+        <template v-slot:prepend>
+          <q-icon name="attach_file" />
+        </template>
+      </q-file>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { storage } from '../plugins/fireFunctions'
 import { ref as firebaseRef, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { useQuasar } from 'quasar'
+const $q = useQuasar()
 
-const onFileChange = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (!target.files) return
-  const file = target.files[0]
+const files = ref(null)
+const uploadStatus = ref<string>('')
+
+const onFileChange = async (newFile: File) => {
+  if (!newFile) {
+    uploadStatus.value = 'No file selected.'
+    return
+  }
+
   try {
-    const storageReference = firebaseRef(storage, 'files/' + file.name)
-    const snapshot = await uploadBytes(storageReference, file)
+    const storageReference = firebaseRef(storage, 'files/' + newFile.name)
+    const snapshot = await uploadBytes(storageReference, newFile)
     const downloadUrl = await getDownloadURL(snapshot.ref)
     console.log('File uploaded! Get the file at:', downloadUrl)
+    $q.notify('File uploaded! Get the file at:' + downloadUrl)
   } catch (error) {
-    console.error('Upload failed', error)
+    console.error('Error uploading file: ', error)
+    uploadStatus.value = 'Error during upload.'
+    $q.notify('Error uploading file: ')
   }
 }
 </script>
